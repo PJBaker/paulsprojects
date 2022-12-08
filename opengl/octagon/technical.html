@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../../ie7.css" type="text/css"/><![endif]-->
+	<title>The Octagon Game Engine Technical Info - Paul's Projects</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../../index.html">
+		<img src="../../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../sh/sh.html">Spherical Harmonics</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../painting/painting.html">Painterly Rendering</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../marble/marble.html">Marble</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../defshad/defshad.html">Deferred Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../octagon/octagon.html">The Octagon Engine</a></li>
+		<li class="menu3_li"><a class="menu3_a" href="technical.html">Technical Information</a></li>
+		<li class="menu3_li"><a class="menu3_a" href="screenshots.html">Screenshots</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../manylights/manylights.html">Many Lights</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../cloth/cloth.html">Cloth Simulation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../gpufire/gpufire.html">GPU Fire</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../rtotex/rtotex.html">Render to Texture</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadvol/shadvol.html">Shadow Volumes</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../refract/refract.html">Refraction</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../ppatten/ppatten.html">Per Pixel Attenuation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../q3bsp/q3bsp.html">Quake 3 BSP</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../dpreflect/dpreflect.html">Dot Product Reflect</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadowmap/shadowmap.html">Shadow Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../metaballs/metaballs.html">Metaballs</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpatten/bumpatten.html">Per Pixel Lighting</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../celshading/celshading.html">Cel Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpmap/bumpmap.html">Bump Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../template/template.html">Project Template</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>The Octagon Engine</h1>
+	<h2>Technical Information</h2>
+	<p>
+		"The Octagon" is a game engine demonstrating per-pixel lighting, bump mapping, shadow volumes and particles.
+		It displays Quake 3 bsp maps, Quake 2 md2 and Quake 3 md3 models.
+	</p>
+	<p>
+		Everything visible is rendered with its decal texture multiplied by a small constant plus its emissive texture, in order to provide the base for adding light.
+		Then, for each light, stencil shadows are cast for each object which the light influences, and then a hardware-specific codepath lights the surface.
+		After all lights have been considered, particles are added.
+	</p>
+	<h2>Maps</h2>
+	<p>
+		The maps used are Quake 3 .bsp maps.
+		These were chosen because of their support for curved surfaces (patches), which are rendered along with the polygon faces.
+		I chose not to render the meshes from the map file, as I would have to do extra work to light them and make them cast shadows.
+		This would have brought no benefits because the map objects can easily be loaded in as static models.
+	</p>
+	<h2>Models</h2>
+	<p>
+		The program also supports animated .md2 Quake 2 models and static Quake 3 .md3 models.
+		These models are loaded into a standard model class which handles drawing, animation and so on.
+		Quake 3 models are not animated as they require the use of the "tags".
+		These "tags" are not required by any other model format, so I did not want to add them to my general model format.
+		I chose to implement the Quake 3 models so I could use the torches and other map objects which are available in that format. 
+	</p>
+	<h2>Visibility Testing</h2>
+	<p>
+		Gross visibility testing is performed using the bsp and frustum culling per sector.
+		This is then refined by testing if each individual face is within the camera frustum.
+		The same procedure is used to see which faces are lit by each light.
+	</p>
+	<h2>Lighting</h2>
+	<p>
+		There are two classes of light available for use.
+		Firstly, there are standard point lights.
+		Secondly, lights with projected cube maps can be used to emulate spotlights and anisotropic light sources.
+	</p>
+	<p>
+		Lights are tagged as visible if their bounding sphere lies within the camera's frustum.
+		The more lights that are visible, the more passes are required.
+		The number of lights visible thus has a huge effect on the speed of the scene.
+	</p>
+	<p>
+		Firstly, everything visible is rendered with its decal texture multiplied by a small constant (0.3) plus its emissive texture, in order to provide the base for adding light.
+		This pass also serves to lay down the data in the z buffer for the passes ahead, which use more expensive fragment shaders.
+		Then, for each light, stencil shadows are cast for each object which the light influences, and then the hardware-specific codepath lights the surface.
+	</p>
+	<h2>Codepaths</h2>
+	<p>
+		The engine currently supports three different codepaths, which are used to take advantage of the capabilities of the hardware on which the engine is running.
+		Only the lighting calculations are dependent on the codepath used.
+		The original ambient pass, the shadow code and the particle code are all the same no matter which codepath is used.
+	</p>
+	<p>
+		There is a standard codepath, using standard OpenGL 1.3 features.
+		This draws everything in three passes.
+		The first lays down per-pixel attenuation.
+		The second modulates this with a bump map, and the third colors the result using the decal texture, any projected cube map and the light's color.
+	</p>
+	<p>
+		The NV20 codepath uses ARB_vertex_program, NV_texture_shader, NV_register_combiners and EXT_blend_color to reduce the number of passes required on Geforce3 and above hardware.
+		It also introdces specular highlights.
+		This codepath draws objects in one, two or three passes depending on surface and light parameters.
+		If the light does not have a projected cube map, the diffuse equation can be evaluated in a single pass, whereas if the light has a cube map, two passes are required.
+		The specular highlights are then added to the shiny surfaces in a further pass.
+	</p>
+	<p>
+		The R200 codepath uses ARB_vertex_program and ATI_fragment_shader, along with the 6 texture units available on Radeon 8500 and above cards from ATi to evaluate the entire lighting equation (diffuse and specular) in a single pass.
+	</p>
+	<h2>Particles</h2>
+	<p>
+		After all of the lights have been handled, particles which emit light of their own are added to the framebuffer.
+		Then, we loop through the lights again and draw any non-light-emitting particles (such as steam particles), lit by any lights which influence them.
+		If a light which is illuminating a particle system has a projected cube map, this is also taken into account, as can be seen by the stained glass window in the demo level.
+	</p>
+	<h2>Texture Maps</h2>
+	<p>
+		The geometry uses up to three texture maps for each surface.
+		As well as the standard color "decal" map, each surface has an emissive map, showing how the surface is "self-lit", and a normal map for the bump mapping.
+		In the alpha channel of the normal map, the gloss map is stored.
+		This is used to modulate the specular lighting to produce surfaces which are shiny/not shiny on a per pixel basis.
+		The default for an alpha channel is white, but we want surfaces to default to being non-shiny.
+		So, gloss is stored inverted.
+		This is handled when a gloss map is loaded by inverting the map.
+		The map is then inverted again as part of the lighting equation.
+	</p>
+	<h2>Console</h2>
+	<p>
+		The console can be activated by pressing the F2 key.
+		This allows you to change the codepath currently being used and to control various rendering parameters.
+		For a list of console variables, see "data/cfg/cfg.txt".
+		Groups of console variables are stored in "*.cfg" files.
+		On first startup, the console loads "default.cfg".
+		When the console is shut down, it saves the current configuration into a file called "previous.cfg".
+		This is then loaded on subsequent executions, in order to preserve the previous settings.
+	</p>
+	<h2>Collision Detection</h2>
+	<p>
+		Simple bounding sphere collision detection is implemented between the camera and the bsp polygon faces. 
+	</p>
+	<h2>Code Organisation</h2>
+	<p>
+		All drawing is controlled by a central render manager.
+		The map and entities submit to the render manager what will be drawn, and the render manager handles the actual drawing code.
+		Thus, triangles are easily sorted by texture, and features such as NV_vertex_array_range and ATI_vertex_array_object can easily be implemented in a single module.
+		All geometry is stored using a single vertex format so that triangles can easily be batched.
+		The vertex format contains the vertex position, the texture coordinates and the tangent space basis for that vertex.
+	</p>
+	<p>
+		Models, particle systems and lights are grouped into entities.
+		Up to one of each of these is part of each entity.
+		The entities follow paths which are loaded in from files in "data/paths".
+		The lights are stored in "data/lights", and the particle system scripts in "data/particles".
+		In "data/maps" the list of entities which populate the map can be found.
+	</p>
+</div>
+
+</body>
+
+</html>

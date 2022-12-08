@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../ie7.css" type="text/css"/><![endif]-->
+	<title>Metaballs II Technical Info - Paul's Projects</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../index.html">
+		<img src="../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="technical.html">Technical Information</a></li>
+		<li class="menu_li"><a class="menu_a" href="../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu_li"><a class="menu_a" href="../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu_li"><a class="menu_a" href="../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>Metaballs II</h1>
+	<p>
+		Metaballs II renders "blobby objects" by using the "Marching Cubes" algorithm to extract an isosurface from a scalar field.
+	</p>
+	<h2>Technical Information</h2>
+	<p>
+		The scalar field is defined to cover the entire area in which the metaballs can move. Each metaball has a centre and a "power" and adds value to the scalar field. The influence of a metaball is greatest at its centre and falls off in an inverse-square manner.
+	</p>
+	<h3>Marching Cubes</h3>
+	<p>
+		Marching cubes works by covering the area in which the metaballs move with a grid of cubes. Two stages are involved:
+	</p>
+	<ul>
+		<li>Calculating the value of the scalar field at each vertex, and</li>
+		<li>For each cube, calculating triangles to approximate the isosurface using the values at its vertices</li>
+	</ul>
+	<p>
+		Metaballs II uses multithreading and double buffering to execute these two stages in parallel, thus producing an approximate 2x speedup on a multi-processor computer. Several optimisations are also applied at each stage.
+	</p>
+	<h4>Stage 1</h4>
+	<p>
+		Calculating the value at each vertex is performed using SSE intrinsics to calculate 4 values at a time. The vertex data is stored internally in a structure-of-arrays arrangement in order to reduce the amount of data manipulation required to use SSE.
+	</p>
+	<p>
+		Redundant calculation of vertices is avoided by the use of a bounding box. The maximum possible extent of the isosurface, given the current metaball centres, is computed and calculation is limited to vertices inside this box.
+	</p>
+	<p>
+		This step also uses OpenMP's "parallel for" construct to allow vertex calculation to be performed on multiple processors concurrently.
+	</p>
+	<p>
+		In order to be able to access SSE intrinsics and OpenMP, the code for this calculation is written in native (unmanaged) C++. It is encapsulated in a simple unmanaged DLL exposing a single 'extern "C"' function, which is called from the main C# code using a P/Invoke.
+	</p>
+	<h4>Stage 2</h4>
+	<p>
+		The naive way to calculate the triangles making up the isosurface would be to search every cube defined, or every cube within the metaballs' bounding box. However, Metaballs II employs a more sophisticated algorithm.
+	</p>
+	<p>
+		For each metaball, the algorithm begins with the cube containing the metaball's centre and then steps out towards the edge of the field, until it comes across a cube containing part of the isosurface. The algorithm then looks recursively at neighbouring cubes until the entire surface is found. A lookup table is used to restrict the neighbouring cubes which are considered to those which are likely to contain the isosurface.
+	</p>
+	<h3>Rendering</h3>
+	<p>
+		Metaballs II renders the scene using Direct3D, through the managed wrappers provided by the <a href="http://slimdx.mdxinfo.com">SlimDX</a> project. HLSL vertex and pixel shaders perform separate refraction calculations for the red, green and blue components, plus a reflection calculation. A simple Fresnel term approximation is used to interpolate between these and produce the final pixel color.
+	</p>
+</div>
+
+</body>
+
+</html>

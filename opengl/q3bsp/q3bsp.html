@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../../ie7.css" type="text/css"/><![endif]-->
+	<title>OpenGL Quake 3 BSP Level Viewer - Paul's Projects</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../../index.html">
+		<img src="../../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../sh/sh.html">Spherical Harmonics</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../painting/painting.html">Painterly Rendering</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../marble/marble.html">Marble</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../defshad/defshad.html">Deferred Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../octagon/octagon.html">The Octagon Engine</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../manylights/manylights.html">Many Lights</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../cloth/cloth.html">Cloth Simulation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../gpufire/gpufire.html">GPU Fire</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../rtotex/rtotex.html">Render to Texture</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadvol/shadvol.html">Shadow Volumes</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../refract/refract.html">Refraction</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../ppatten/ppatten.html">Per Pixel Attenuation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../q3bsp/q3bsp.html">Quake 3 BSP</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../dpreflect/dpreflect.html">Dot Product Reflect</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadowmap/shadowmap.html">Shadow Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../metaballs/metaballs.html">Metaballs</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpatten/bumpatten.html">Per Pixel Lighting</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../celshading/celshading.html">Cel Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpmap/bumpmap.html">Bump Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../template/template.html">Project Template</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>Quake 3 BSP</h1>
+	<div style="text-align: center">
+		<img src="q3bsp1.png" alt="Quake 3 BSP 1" style="border: 3px solid #4040FF"/>
+       	&nbsp;
+       	<img src="q3bsp2.png" alt="Quake 3 BSP 2" style="border: 3px solid #4040FF"/>
+	</div>
+	<h2>Description:</h2>
+	<p>
+		This program loads in and displays a quake 3 level.
+	</p>
+	<p>
+		The following are implemented:<br/><br/>
+		Polygon Faces<br/>
+		In-level meshes<br/>
+		Curved surfaces<br/>
+		Lightmapping<br/>
+		BSP &amp; PVS
+	</p>
+	<p>
+		The program uses "config.txt" for a map name and initial camera position.
+		It also reads in the curve tesselation (curved surfaces are tesselated once, on loading).
+		These attributes can thus be changed without requiring a recompile.
+	</p>
+	<p>
+		I have created a small level using GtkRadiant to demonstreate the techniques.
+		Note I am yet to implement billboards, which is why the torches do not have any flames above them.
+	</p>
+	<h2>Requirements:</h2>
+    <p>
+		ARB_multitexture<br/>
+		EXT_texture_env_combine
+	</p>
+	<p>
+		Optional:<br/>
+		EXT_multi_draw_arrays<br/>
+		EXT_draw_range_elements
+	</p>
+	<h2>References:</h2>
+    <p>
+		Quake 3 BSP Format, by Ben Humphrey.
+    	<a href="http://www.gametutorials.com">
+			http://www.gametutorials.com
+		</a>
+	</p>
+	<p>
+    	 Unofficial Quake 3 map specs, by Kekoa Proudfoot.
+		<a href="http://graphics.stanford.edu">
+			http://graphics.stanford.edu
+		</a>
+	</p>
+	<h2>Download:</h2>
+    <p>
+		<a href="q3bsp.zip">
+			q3bsp.zip (594 KB)
+		</a>
+	</p>
+</div>
+
+</body>
+
+</html>

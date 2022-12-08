@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../ie7.css" type="text/css"/><![endif]-->
+	<title>MegaReader: Sega Megadrive / Genesis Cartridge Reader</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../index.html">
+		<img src="../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu_li"><a class="menu_a" href="../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu_li"><a class="menu_a" href="../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu_li"><a class="menu_a" href="../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>MegaReader</h1>
+	<p>
+		Inspired by Mike Gordon's
+		<a href="http://www.smspower.org/smsreader">
+			SMSReader
+		</a>
+		(left), I have designed and built the MegaReader (right), a similar tool.
+	</p>
+	<div style="text-align: center">
+		<img src="smsreader.png" alt="SMSReader" style="border: 3px solid #4040FF"/>
+       	&nbsp;
+       	<img src="megareader.png" alt="MegaReader" style="border: 3px solid #4040FF"/>
+	</div>
+	<p>
+		The SMSReader is an interface between a PC and a Sega Master System cartridge, which allows the contents of the cartridge to be read into the PC.
+	</p>
+	<p>
+		The SMS only allocates 48K of its 64K (16 bit) address space to cartridge ROM, so most games use a banking system.
+		Banking hardware within the cartridge allows larger ROMS to be used.
+		The SMSReader, in order to read a cartridge, thus needs to be able to write to the cartridge.
+		Also, with a re-writable cartridge, the SMSReader can transfer data from the PC so that home-brew games and demos can be tested on a real system.
+		The SMSReader therefore supports both reading from and writing to a cartridge.
+	</p>
+	<p>
+		The MegaReader is designed to perform the same job for the Sega Megadrive/Genesis system.
+	</p>
+	<p>
+		Since the Megadrive allocates 4MB (of 16MB) to cartridge ROM, very few cartridges use bank switching.
+		In order to perform a read therefore, the MegaReader does not need to be able to write to the cartridge.
+		Also, I do not have any schematics to build a re-writable cartridge for the Megadrive, so the MegaReader currently only supports reading from a cartridge.
+	</p>
+	<h2>Parts List</h2>
+	<table>
+		<tr>
+			<td><b>Description</b></td>
+			<td><b>Quantity</b></td>
+			<td><b><a href="http://www.maplin.co.uk/">Maplin</a> part number</b></td>
+		</tr>
+		<tr><td>Stripboard - 39 strips x 62 holes</td><td>1</td><td>JP50E</td></tr>
+		<tr><td>16V 22uF Tantalum Capacitor</td><td>1</td><td>WW72P</td></tr>
+		<tr><td>35V 470uF Electrolytic Capacitor</td><td>1</td><td>VH47B</td></tr>
+		<tr><td>16V 100nF Ceramic Capacitor</td><td>5</td><td>YR75S</td></tr>
+		<tr><td>100V 220nF Ceramic Capacitor</td><td>1</td><td>RA50E</td></tr>
+		<tr><td>SIL Resistor 47K ohm</td><td>1</td><td>RA31J</td></tr>
+		<tr><td>1N4001 Rectifier Diode</td><td>1</td><td>QL73Q</td></tr>
+		<tr><td>7805 +5 volt regulator</td><td>1</td><td>QL31J</td></tr>
+		<tr><td>4040 CMOS 12 bit binary counter IC</td><td>2</td><td>QW27E</td></tr>
+		<tr><td>4019 Quad AND/OR Select Gate IC</td><td>2</td><td>QW17T</td></tr>
+		<tr><td>4049 Hex Buffer Inverting IC</td><td>1</td><td>QX21X</td></tr>
+		<tr><td>16 pin DIL IC socket</td><td>5</td><td>BL19V</td></tr>
+		<tr><td>36 way 0.1in pitch edge connector</td><td>2</td><td>JB99H</td></tr>
+		<tr><td>2.1mm power connector</td><td>1</td><td>RK37S</td></tr>
+		<tr><td>25 Pin D-type right angled plug connector</td><td>1</td><td>FG68Y</td></tr>
+		<tr><td>2.2k ohm metal film resistor</td><td>3</td><td>M2K2</td></tr>
+		<tr><td>100V 4.7nF Ceramic Capacitor</td><td>3</td><td>WX76H</td></tr>
+		<tr><td>Bell Wire</td><td>5</td><td>XS92A</td></tr>
+	</table>
+	<p>
+		The megadrive uses a 64-way cartridge edge detector, but Maplin do not sell these.
+		It is necessary to buy two 36-way connectors and cut the last 4 connections off each, then solder them to the board next to each other.
+	</p>
+	<h2>Circuit Diagram</h2>
+	<p>
+		The circuit diagram is available <a href="megadiagram.png">here</a>.
+		It should be the right size to print onto an A4 sheet of paper.
+		The red crosses on the circuit diagram are places where the tracks on the underside of the board must be cut.
+		As well as these, the tracks should be cut underneath each of the ICs and the cartridge connector, to isolate opposite pins from each other.
+		The entire power supply section is exactly the same as that for the SMSReader.
+		You can look at the instructions there if you are confused.
+	</p>
+	<h2>Key</h2>
+	<table>
+		<tr><td><b>Symbol</b></td><td><b>Meaning</b></td></tr>
+		<tr><td><img src="break.png" alt="Break track here"/></td><td>Break track here</td></tr>
+		<tr><td><img src="wireno.png" alt="Wire number"/></td><td>Solder a wire between this number and the other hole with the same number</td></tr>
+		<tr><td><img src="ano.png" alt="Wire number"/></td><td>Solder a wire between this number and the same number on side A of the cartridge connector</td></tr>
+		<tr><td><img src="bno.png" alt="Wire number"/></td><td>Solder a wire between this number and the same number on side B of the cartridge connector</td></tr>
+		<tr><td><img src="pno.png" alt="Wire number"/></td><td>Solder a wire between here and the numbered pin on the parallel port</td></tr>
+		<tr><td><img src="pve.png" alt="Wire number"/></td><td>Solder a wire between here and the positive pin of the power connector</td></tr>
+		<tr><td><img src="nve.png" alt="Wire number"/></td><td>Solder a wire between here and the negative pin of the power connector</td></tr>
+		<tr><td><img src="sil.png" alt="SIL Resistor 47K ohm"/></td><td>SIL Resistor 47K ohm</td></tr>
+		<tr><td><img src="res.png" alt="2.2k ohm metal film resistor"/></td><td>2.2k ohm metal film resistor</td></tr>
+		<tr><td><img src="cap1.png" alt="16V 100nF Ceramic Capacitor"/></td><td>16V 100nF Ceramic Capacitor</td></tr>
+		<tr><td><img src="cap2.png" alt="100V 4.7nF Ceramic Capacitor"/></td><td>100V 4.7nF Ceramic Capacitor</td></tr>
+		<tr><td><img src="cap3.png" alt="35V 470uF Electrolytic Capacitor"/></td><td>35V 470uF Electrolytic Capacitor</td></tr>
+		<tr><td><img src="cap4.png" alt="100V 220nF Ceramic Capacitor"/></td><td>100V 220nF Ceramic Capacitor</td></tr>
+		<tr><td><img src="cap5.png" alt="16V 22uF Tantalum Capacitor"/></td><td>16V 22uF Tantalum Capacitor</td></tr>
+		<tr><td><img src="regulator.png" alt="7805 +5 volt regulator"/></td><td>7805 +5 volt regulator (I=Input, G=Ground, O=Output)</td></tr>
+		<tr><td><img src="diode.png" alt="1N4001 Rectifier Diode"/></td><td>1N4001 Rectifier Diode</td></tr>
+	</table>
+	<h2>Driver</h2>
+	<p>
+		You can download the (very simple) Windows driver for the MegaReader <a href="megadriver.zip">here</a>.
+	</p>
+	<h2>Disclaimer</h2>
+	<p>
+		This information is provided "as is", with no guarantee of correctness.
+		I accept no responsibility for any damage or injury caused by using this information. 
+	</p>	
+</div>
+
+</body>
+
+</html>

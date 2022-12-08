@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../../ie7.css" type="text/css"/><![endif]-->
+	<title>OpenGL Shadow Mapping: 8, 16 and 24-bit - Paul's Projects</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../../index.html">
+		<img src="../../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../sh/sh.html">Spherical Harmonics</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../painting/painting.html">Painterly Rendering</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../marble/marble.html">Marble</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../defshad/defshad.html">Deferred Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../octagon/octagon.html">The Octagon Engine</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../manylights/manylights.html">Many Lights</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../cloth/cloth.html">Cloth Simulation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../gpufire/gpufire.html">GPU Fire</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../rtotex/rtotex.html">Render to Texture</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadvol/shadvol.html">Shadow Volumes</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../refract/refract.html">Refraction</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../ppatten/ppatten.html">Per Pixel Attenuation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../q3bsp/q3bsp.html">Quake 3 BSP</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../dpreflect/dpreflect.html">Dot Product Reflect</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadowmap/shadowmap.html">Shadow Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../metaballs/metaballs.html">Metaballs</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpatten/bumpatten.html">Per Pixel Lighting</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../celshading/celshading.html">Cel Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpmap/bumpmap.html">Bump Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../template/template.html">Project Template</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>Shadow Mapping</h1>
+	<div style="text-align: center">
+		<img src="shadowmap1.png" alt="Shadow Mapping 1" style="border: 3px solid #4040FF"/>
+       	&nbsp;
+       	<img src="shadowmap2.png" alt="Shadow Mapping 2" style="border: 3px solid #4040FF"/>
+	</div>
+	<h2>Description:</h2>
+	<p>
+		This program displays a simple scene, lit by a single light.
+		The scene is first rendered from the light's point of view, and the depth values are loaded into a texture.
+		This texture is then projected onto the scene as drawn from the eye's point of view, and a comparison with distance from the light is made.
+		This determines shadowed regions.
+	</p>
+	<p>
+		This demo implements 8-bit "Dual Texture" shadow mapping and a 16-bit version using register combiners.
+		24-bit hardware shadow mapping is also demonstrated.
+	</p>
+	<h2>Requirements:</h2>
+    <p>
+		ARB_multitexture<br/>
+		EXT_texture_env_combine
+	</p>
+	<h4>Required for 16-bit shadow mapping:</h4>
+	<p>
+		NV_register_combiners
+	</p>
+	<h4>Required for hardware shadow mapping:</h4>
+	<p>
+		SGIX_depth_texture<br/>
+		SGIX_shadow<br/>
+		EXT_blend_minmax
+	</p>
+	<h2>References:</h2>
+    <p>
+		Shadow Mapping with Today's OpenGL Hardware, by Mark Kilgard.
+    	<a href="http://developer.nvidia.com">
+			developer.nvidia.com
+		</a>
+	</p>
+	<p>
+    	Projective Texture Mapping, by Cass Everitt.
+		<a href="http://developer.nvidia.com">
+			developer.nvidia.com
+		</a>
+	</p>
+	<p>
+    	Hardware Shadow Mapping, by Cass Everitt.
+		<a href="http://developer.nvidia.com">
+			developer.nvidia.com
+		</a>
+	</p>
+	<p>
+    	"Shadowcast" demo.
+		<a href="http://developer.nvidia.com">
+			developer.nvidia.com
+		</a>
+	</p>
+	<h2>Download:</h2>
+    <p>
+		<a href="shadowmap.zip">
+			shadowmap.zip (125 KB)
+		</a>
+	</p>
+</div>
+
+</body>
+
+</html>

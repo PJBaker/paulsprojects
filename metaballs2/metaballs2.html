@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../ie7.css" type="text/css"/><![endif]-->
+	<title>Metaballs II: C#, SSE & Direct3D with HLSL - Paul's Projects</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../index.html">
+		<img src="../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="technical.html">Technical Information</a></li>
+		<li class="menu_li"><a class="menu_a" href="../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu_li"><a class="menu_a" href="../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu_li"><a class="menu_a" href="../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>Metaballs II</h1>
+	<div style="text-align: center">
+		<img src="metaballs21.png" alt="Metaballs II" style="border: 3px solid #4040FF"/>
+       	&nbsp;
+       	<img src="metaballs22.png" alt="Metaballs II" style="border: 3px solid #4040FF"/>
+	</div>
+	<h2>Description:</h2>
+	<p>
+		Metaballs II renders "blobby objects" by using the "Marching Cubes" algorithm to extract an isosurface from a scalar field.
+	</p>
+	<p>
+		Compared to my old <a href="../opengl/metaballs/metaballs.html">Metaballs</a> demo, Metaballs II features improved graphics and a 6x speed improvement.
+	</p>
+	<p>
+		The majority of the program is written in C#. The scene is rendered using Direct3D; including HLSL vertex and pixel shaders, through the managed wrappers provided by the <a href="http://slimdx.mdxinfo.com">SlimDX</a> project.
+	</p>
+	<p>
+		The massive speed improvement over my previous work on Metaballs has been achieved through the use of improved algorithms and more advanced technologies, including OpenMP and SSE intrinsics.
+	</p>
+	<p>
+		For detailed information on the techniques used, see the <a href="technical.html">technical information</a> page.
+	</p>
+	<h2>System Requirements:</h2>
+	<p>
+		Hardware support for:
+		<ul>
+			<li>Vertex shader 2.0</li>
+			<li>Pixel shader 2.0</li>
+			<li>4x Anti-aliasing</li>
+		</ul>
+	</p>
+	<p>
+		Software:
+		<ul>
+			<li>Microsoft .NET Framework 2.0</li>
+			<li>DirectX Runtime (November 2007)</li>
+		</ul>
+	</p>
+	<h2>Download:</h2>
+    <p>
+		<a href="metaballs2.zip">
+			metaballs2.zip (1.7 MB)
+		</a>
+	</p>
+</div>
+
+</body>
+
+</html>

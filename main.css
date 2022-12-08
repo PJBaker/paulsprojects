@@ -1,0 +1,169 @@
+body.grey_background
+{
+	background-color: #E0E0E0;
+}
+
+#menu
+{
+	position: absolute;
+	left: 8px;
+	top: 8px;
+	width: 185px;
+	font-family: sans-serif;
+}
+
+ul.menu_ul
+{
+	margin-top: 0;
+	list-style: none;
+	margin-left: 0px;
+	padding-left: 0px;
+}
+
+li.menu_li
+{
+	border-top: 1px solid #000000;
+	border-left: 1px solid #000000;
+	border-right: 1px solid #000000;
+	border-bottom-style: none;
+}
+
+li.menu_li_bottom
+{
+	border: 1px solid #000000;
+}
+
+a.menu_a
+{
+	display: block;
+	width: 178px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 5px;
+	background: #ACACE4;
+	color: #000000;
+	text-decoration: none;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+a.menu_a:hover
+{
+	background: #4040ff;
+	color: #ffffff
+}
+
+li.menu2_li
+{
+	border-top: 1px solid #000000;
+	border-left: 1px solid #000000;
+	border-right: 1px solid #000000;
+	border-bottom-style: none;
+}
+
+li.menu2_li_bottom
+{
+	border: 1px solid #000000;
+}
+
+a.menu2_a
+{
+	display: block;
+	width: 173px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 10px;
+	background: #D1D1F1;
+	color: #000000;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+a.menu2_a:hover
+{
+	background: #4040ff;
+	color: #ffffff
+}
+
+li.menu3_li
+{
+	border-top: 1px solid #000000;
+	border-left: 1px solid #000000;
+	border-right: 1px solid #000000;
+	border-bottom-style: none;
+}
+
+li.menu3_li_bottom
+{
+	border: 1px solid #000000;
+}
+
+a.menu3_a
+{
+	display: block;
+	width: 163px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 20px;
+	background: #E8E8F8;
+	color: #000000;
+	text-decoration: none;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+a.menu3_a:hover
+{
+	background: #4040ff;
+	color: #ffffff
+}
+
+div.menu_spacing
+{
+	height: 30px;
+}
+
+div.menu_small_spacing
+{
+	height: 7px;
+}
+
+#main
+{
+	position: absolute;
+	top: 8px;
+	left: 200px;
+	width: auto;
+	min-width: 768px;
+	margin-right: 5px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+	background-color: #FFFFFF;
+	border: 1px solid #000000;
+	font-family: sans-serif;
+}
+
+a.blue
+{
+	background: #FFFFFF;
+	color: #4040ff;
+	text-decoration: none;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+a.blue:visited
+{
+	background: #FFFFFF;
+	color: #4040ff;
+	text-decoration: none;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+	margin-top: 20px;
+}

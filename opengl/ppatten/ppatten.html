@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../../ie7.css" type="text/css"/><![endif]-->
+	<title>OpenGL Per-Pixel Attenuation - Paul's Projects</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../../index.html">
+		<img src="../../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../sh/sh.html">Spherical Harmonics</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../painting/painting.html">Painterly Rendering</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../marble/marble.html">Marble</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../defshad/defshad.html">Deferred Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../octagon/octagon.html">The Octagon Engine</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../manylights/manylights.html">Many Lights</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../cloth/cloth.html">Cloth Simulation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../gpufire/gpufire.html">GPU Fire</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../rtotex/rtotex.html">Render to Texture</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadvol/shadvol.html">Shadow Volumes</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../refract/refract.html">Refraction</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../ppatten/ppatten.html">Per Pixel Attenuation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../q3bsp/q3bsp.html">Quake 3 BSP</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../dpreflect/dpreflect.html">Dot Product Reflect</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadowmap/shadowmap.html">Shadow Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../metaballs/metaballs.html">Metaballs</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpatten/bumpatten.html">Per Pixel Lighting</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../celshading/celshading.html">Cel Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpmap/bumpmap.html">Bump Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../template/template.html">Project Template</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>Per Pixel Attenuation</h1>
+	<div style="text-align: center">
+		<img src="ppatten1.png" alt="Per Pixel Attenuation 1" style="border: 3px solid #4040FF"/>
+       	&nbsp;
+       	<img src="ppatten2.png" alt="Per Pixel Attenuation 2" style="border: 3px solid #4040FF"/>
+	</div>
+	<h2>Description:</h2>
+	<p>
+		This program displays a cube consisting simply of six quads.
+		A light, using per-pixel attenuation, bounces inside the cube.
+		The attenuation is calculated in four ways.
+	</p>
+	<p>
+		For the first three methods, the attenuation equation used is:
+	</p>
+	<p>
+		<code>Attenuation=1-(d^2)/(r^2)</code>
+	</p>
+	<p>
+		where:
+	</p>
+	<table style="border: 1px solid #000000">
+		<tr>
+			<td><b>d</b></td>
+			<td>is the distance from the point to the light</td>
+		</tr>
+		<tr>
+			<td><b>r</b></td>
+			<td>is the light's radius</td>
+		</tr>
+	</table>
+	<p>
+		The fourth method uses a Gaussian equation:
+	</p>
+	<p>
+		<code>Attenuation=exp(-k*d^2)</code>
+	</p>
+	<h4>Method 1</h4>
+	<p>
+		This is the method used by my "Per Pixel Lighting" project.
+		It uses two textures storing the attenuation values, and computes 1-(Tex1+Tex2) in the register combiners.
+	</p>
+	<p>
+		<b>Advantages:</b> Relatively low hardware requirements<br/>
+		<b>Disadvantages:</b> 2 texture units used
+	</p>
+	<h4>Method 2</h4>
+	<p>
+		Using PASS_THROUGH_NV, part of NV_texture_shader, allows the texture coordinates passed to a texture unit to be interpolated, clamped to [0,1] and made available to the register combiners.
+		The attenuation function is then calculated in the combiners.
+	</p>
+	<p>
+		<b>Advantages:</b> No textures used, Only 1 TMU used, Fastest method<br/>
+		<b>Disadvantages:</b> Nvidia specific
+	</p>
+	<h4>Method 3</h4>
+	<p>
+		This method is much like method 1, but uses a 3d texture instead of 2 textures.
+		This saves a TMU.
+	</p>
+	<p>
+		<b>Advantages:</b> Only 1 TMU used<br/>
+		<b>Disadvantages:</b> Requires 3d texture support
+	</p>
+	<h4>Method 4</h4>
+	<p>
+		Gaussian attenuation is implemented similarly to method 1.
+		It uses two textures to compute the attenuation, but using a simpler equation.
+		The Gaussian function is separable by multiplication rather than by addition, so all that is needed to calculate it is a simple modulation of two textures.
+		In this demo, this is done with register combiners for similarity to the other methods, but this can easily be calculated without.
+	</p>
+	<p>
+		<b>Advantages:</b> Low hardware requirements (only multitexture required)<br/>
+		<b>Disadvantages:</b> Uses 2 texture units
+	</p>
+	<h2>Requirements:</h2>
+    <p>
+		EXT_texture_edge_clamp<br/>
+		ARB_multitexture with at least 3 texture units<br/>
+		NV_vertex_program<br/>
+		NV_register_combiners
+	</p>
+	<h4>Recommended:</h4>
+	<p>
+		EXT_texture3D<br/>
+		NV_texture_shader
+	</p>
+	<h2>References:</h2>
+    <p>
+		Texture Compositing with Register Combiners, by John Spitzer.
+    	<a href="http://developer.nvidia.com">
+			http://developer.nvidia.com
+		</a>
+	</p>
+	<p>
+    	Real-Time Per-Pixel Point Lights and Spot Lights, by Ron Frazier.
+		<a href="http://www.ronfrazier.net/apparition">
+			http://www.ronfrazier.net/apparition
+		</a>
+	</p>
+	<p>
+    	Gaussian Attenuation, by Ignacio Castano.
+		<a href="http://talika.eii.us.es/~titan/articles/">
+			http://talika.eii.us.es/~titan/articles/
+		</a>
+	</p>
+	<h2>Download:</h2>
+    <p>
+		<a href="ppatten.zip">
+			ppatten.zip (169 KB)
+		</a>
+	</p>
+</div>
+
+</body>
+
+</html>

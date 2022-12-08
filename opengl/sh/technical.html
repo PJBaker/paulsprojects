@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../../ie7.css" type="text/css"/><![endif]-->
+	<title>OpenGL Spherical Harmonics Technical Info - Paul's Projects</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../../index.html">
+		<img src="../../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../sh/sh.html">Spherical Harmonics</a></li>
+		<li class="menu3_li"><a class="menu3_a" href="technical.html">Technical Information</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../painting/painting.html">Painterly Rendering</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../marble/marble.html">Marble</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../defshad/defshad.html">Deferred Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../octagon/octagon.html">The Octagon Engine</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../manylights/manylights.html">Many Lights</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../cloth/cloth.html">Cloth Simulation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../gpufire/gpufire.html">GPU Fire</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../rtotex/rtotex.html">Render to Texture</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadvol/shadvol.html">Shadow Volumes</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../refract/refract.html">Refraction</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../ppatten/ppatten.html">Per Pixel Attenuation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../q3bsp/q3bsp.html">Quake 3 BSP</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../dpreflect/dpreflect.html">Dot Product Reflect</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadowmap/shadowmap.html">Shadow Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../metaballs/metaballs.html">Metaballs</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpatten/bumpatten.html">Per Pixel Lighting</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../celshading/celshading.html">Cel Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpmap/bumpmap.html">Bump Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../template/template.html">Project Template</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>Spherical Harmonics</h1>
+	<h2>Technical Information</h2>
+	<p>
+		This program displays a simple looking scene (actually containing approximately 25,000 vertices) which can be lit in 3 different ways.
+		As well as standard OpenGL lighting, the scene can be lit by two techniques which make use of spherical harmonics.
+		This method produces global illumination style images in real time, but usually only for static objects.
+	</p>
+	<h2>The Real Spherical Harmonics</h2>
+	<p>
+		The real spherical harmonics are orthonormal basis functions on the surface of a sphere.
+		Any given function on a sphere can be encoded as the sum of scaled copies of these basis functions.
+		The scaling factors used are called the coefficients, and can easily be arranged to form a vector.
+		If we want to integrate the product of two functions encoded in this way over a sphere then, due to the orthonormality, this is done simply by taking the dot product of the two vectors of coefficients.
+	</p>
+	<h2>Realistic Lighting</h2>
+	<p>
+		The most realistic lighting solution possible is formulated in the "rendering equation".
+		The most difficult term in this equation is an integral over a sphere.
+		We can split the integrand for this into 2 parts, one relating to the light source, and one relating to the surface we are shading.
+		By projecting these two functions onto the SH basis functions, we can obtain the vectors of coefficients above, and evaluation of the lighting at a point becomes a simple dot product of coefficients.
+	</p>
+	<h2>Rotation Invariance</h2>
+	<p>
+		One important property of the projection into spherical harmonic coefficients is that it is rotation invariant.
+		That is, rotating a function and projecting into SH "space" is just the same as projecting, then rotating.
+		This way, we can rotate the light source around an object without having to project the rotated light source into SH coefficients explicitly.
+		We can take the coefficients for the light source in some standard orientation, and apply a rotation matrix to get the coefficents for the light in another position.
+		Thus the position of the light relative to our object can easily be varied.
+		This demo uses the simple method of using separate rotation matrices for rotations about the Y and Z axes, as described in the paper by Green.
+	</p>
+	<h2>The Transfer Function</h2>
+	<p>
+		The SH coefficients at a vertex are a compact representation of how light will be reflected by that vertex.
+		The data encoded in them can include shadowing and interreflection information.
+		We will call this a transfer function.
+		Calculating the transfer function for each vertex requires a Monte-Carlo integration.
+		The demo performs this integration at each vertex using 2500 samples.
+	</p>
+	<h2>Handling Animated Scenes</h2>
+	<p>
+		The SH coefficients which encode the transfer function at a vertex are more complicated than those which encode the light source, as they include shadowing information.
+		This varies unpredictably, so the scene to be lit is static.
+		You could apply the lighting to an animated model, for example a Quake 2 model, by encoding the transfer function at each vertex for each keyframe, and linearly interpolating between frames when rendering, exactly the same way as position and normal data is interpolated between keyframes.
+	</p>
+</div>
+
+</body>
+
+</html>

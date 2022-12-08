@@ -1,0 +1,1273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../../ie7.css" type="text/css"/><![endif]-->
+	<title>Simple OpenGL Bump Mapping Tutorial - Paul's Projects</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../../index.html">
+		<img src="../../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../smt/smt.html">Shadow Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../simplebump/simplebump.html">Simple Bump Mapping</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>Simple Bumpmapping</h1>
+	<h2>Rotating, Diffuse Lit Torus</h2>
+	<p>
+		In the last few weeks I have seen many forum posts from people who want to use bump mapping in their applications.
+		Despite this, there are no "simple" tutorials on how to acheive the effect.
+		This is my attempt at explaining how to implement this technique.
+	</p>
+	<p>
+		This is the first time I have written a tutorial. Please feel free to tell me what you think.
+	</p>
+	<p>
+		We will use some OpenGL extensions to acheive this, but they are not vendor specific and will work on any NVidia Geforce series card, any ATI Radeon series card, and some others.
+		If you have not used OpenGL extensions before, I will explain what is necessary to set them up.
+		However, I am aiming this tutorial mainly at people who understand multitexturing and also preferably cube maps.
+	</p>
+	<p>
+		I will use glut for window management to keep the tutorial as simple as possible.
+	</p>
+	<p>
+		This is what we will acheive.
+		The left picture shows the bump mapped torus, the right hand picture shows the same torus with standard OpenGL vertex lighting.
+		You can download the demo at the bottom of this page.
+	</p>
+	<div style="text-align: center">
+		<img src="simplebump1.jpg" alt="Bump mapped torus" style="border: 3px solid #4040FF"/>
+       	&nbsp;
+       	<img src="simplebump2.jpg" alt="Torus using OpenGL vertex lighting" style="border: 3px solid #4040FF"/>
+	</div>
+	<h2>The OpenGL Lighting Equation</h2>
+	<p>
+		The red book defines the standard OpenGL lighting equation as:
+	</p>
+	<p>
+		<code>Vertex Color = emission + globalAmbient + sum(attenuation * spotlight *<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[lightAmbient + (max {L.N, 0} * diffuse) + (max {H.N, 0} ^ shininess)*specular])</code>
+	</p>
+	<p>
+		Where:
+	</p>
+	<table style="border: 1px solid #000000">
+		<tr><td>emission</td><td>is the material's emissive color</td></tr>
+		<tr><td>globalAmbient</td><td>is the ambient color*global ambient brightness</td></tr>
+		<tr><td>attenuation</td><td>is a term causing lights to become dimmer with distance</td></tr>
+		<tr><td>spotlight</td><td>is a term causing spotlight effects</td></tr>
+		<tr><td>lightAmbient</td><td>is the light's ambient color*brightness</td></tr>
+		<tr><td>diffuse</td><td>is the light's diffuse color * the material's diffuse color</td></tr>
+		<tr><td>shininess</td><td>is the specular exponent, which tells us how shiny a surface is</td></tr>
+		<tr><td>specular</td><td>is the light's specular color * the material's specular color</td></tr>
+		<tr><td>L</td><td>is the normalised(unit length) vector from the vertex we are lighting to the light</td></tr>
+		<tr><td>N</td><td>is the unit length normal to our vertex</td></tr>
+		<tr><td>H</td><td>is the normalised "half angle" vector, which points half way between L and the viewer (V)</td></tr>
+	</table>
+	<p>
+		Here is a diagram describing these vectors:
+	</p>
+	<img src="vectors.jpg" alt="Vectors used in the lighting equation lighting"/>
+	<p>
+		Our aim is to evaluate the lighting equation per pixel.
+		Then, by altering the normal, we can achieve a bumpy effect.
+		There is no way we are going to be able to evaluate all of the above, especially without using any fragment programs, register combiners etc.
+		So, we will simplify the equation.
+	</p>
+	<h4>Simplifications:</h4>
+	<p>
+		No ambient light<br/>
+		No emitted light<br/>
+		Only one light source<br/>
+		No attenuation or spotlight effects<br/>
+		No specular
+	</p>
+	<p>
+		Thus our per pixel lighting equation is simply:
+	</p>
+	<p>
+		<code>color = max{l.n, 0}*diffuse</code>
+	</p>
+	<h2>Coordinate Spaces</h2>
+	<p>
+ 		The next thing you will have to figure out in order to understand bump mapping is coordinate spaces.
+		There are many coordinate spaces used in this tutorial.
+		Here is a diagram of them, and the matrices converting one to another:
+	</p>
+		<img src="spaces.jpg" alt="Coordinate spaces"/>
+	<p>
+		Here are the five coordinate spaces we will use.
+		I presume you are familiar with the standard OpenGL modelview and projection matrices.
+		From the picture above, you can see that the modelview matrix takes coordinates in object space and converts them to view space, and the projection matrix takes coordinates in view space and converts them to clip space.
+		After clip space, your coordinates undergo "perspective divide" and the viewport transformation and are then in "window coordinates" ready to be drawn on the screen.
+	</p>
+	<p>
+		When you specify vertices, you do so in object space.
+		Thus the modelview and projection matrices together convert from object space to clip space.
+		If you wanted to convert back from view space to object space, you could transform your vertices by the inverse of the modelview matrix.
+	</p>
+	<p>
+		So, what's this "Tangent space"? And what's the "TBN matrix"?
+	</p>
+	<p>
+ 		OK. This is probably the hardest part to understand.
+		Tangent space is a space local to the surface of our model.
+		Lets consider a single quad:
+	</p>
+		<img src="tangents.jpg" alt="Tangent space"/>
+	<p>
+		Now you all know what a normal is, right? It is a vector (in this case normalised) pointing out of the quad.
+		In this image, the normal at each vertex is pointing out of the screen.
+	</p>
+	<p>
+		Now, we need to find two tangents at the vertex.
+		The "S Tangent" points in the direction of increase of the s texture coordinate.
+		The "T Tangent" points in the direction of increase of the T texture coordinate.
+	</p>
+	<p>
+		The 2 tangents and the normal form a "basis" at the vertex.
+		They define a coordinate space- "tangent space".
+		Think of the s tangent, t tangent and normal as the x, y and z axes of this space respectively.
+		The TBN matrix is the matrix to convert from object space to tangent space, and it is composed like:
+	</p>
+	<p>
+		<code>( Sx Sy Sz )<br/>
+		( Tx Ty Tz )<br/>
+		( Nx Ny Nz )</code>
+	</p>
+	<p>
+		where <code>Sx, Sy</code> and <code>Sz</code> are the components of the S tangent,
+		<code>Tx, Ty, Tz</code> are the components of the T tangent,
+		and <code>Nx, Ny, Nz</code> are the components of the normal.
+	</p>
+	<p>
+		By multiplying a vector in object space by this matrix, you get the vector in tangent space.
+	</p>
+	<p>
+		By the way, the name TBN matrix comes from "Tangent, Binormal, Normal".
+		The "Binormal" is another name for the t tangent.
+		I believe the name "t tangent" makes more clear what this vector actually represtents.
+	</p>
+	<h2>Normal Maps</h2>
+	<p>
+		So, how do we change the normals on a per pixel basis?
+		Much the same way as you would change the color of a model per pixel, by using a texture map.
+		However, the normal map needs to store normal vectors, not colors.
+	</p>
+	<p>
+		Our normals look like:
+	</p>
+	<p>
+		<code>(x)<br/>
+		(y)<br/>
+		(z)</code>
+	</p>
+	<p>
+		Since they are unit length, <code>(x*x)+(y*y)+(z*z)=1</code>. Thus x, y and z lie between -1 and 1.
+		We can represent these in a texture map by letting the red, green and blue components of the texture equal x, y and z respectively.
+		The color components which we will use to represent the vector must lie between 0 and 1. So, we put:
+	</p>
+	<p>
+		<code>r = (x+1)/2;<br/>
+		g = (y+1)/2;<br/>
+		b = (z+1)/2;</code>
+	</p>
+	<p>
+		Take a minute to convince yourselves that every possible unit normal can be stored in a color this way.
+	</p>
+	<p>
+		The normals we enclose in the texture map will be in tangent space.
+		In tangent space, the usual normal points in the z direction.
+		Hence the RGB color for the straight up normal is (0.5, 0.5, 1.0).
+		This is why normal maps are a blueish color.
+	</p>
+	<p>
+		Here is the normal map we will be using for our example.
+	</p>
+	<img src="normal.jpg" alt="Normal map"/>
+	<h2>Cube Maps</h2>
+	<p>
+		Recall that a 2d texture is a flat quad, a 2d array of colors.
+		Imagine six square 2d textures, and put these together as the faces of a cube.
+		This is a cube map.
+		To access texture colors in a cube map, we use 3-component texture coordinates, ie glTexCoord3f rather than glTexCoord2f, or in our example, the corresponding vertex array structure.
+	</p>
+	<p>
+		Imagine centering the cube around the origin.
+		Given a 3d texture coordinate, we can draw a line from the origin to our coordinate.
+		The texture color at the point where this line(extended if necessary) meets the cube is the color used for texture mapping. Easy eh?
+	</p>
+	<p>
+		This means that the vector (2, 1, 2) and (8, 4, 8) and in fact (2k, k, 2k) for any k all return the same result.
+	</p>
+	<p>
+		Here is an example. If we pass the coordinates of the green X into glTexCoord3f, OpenGL will use the red texture color, which can be calculated by drawing the green line and seeing where it intersects the cube.
+	</p>
+	<img src="cubemap.jpg" alt="Cube map"/>
+	<h2>Normalisation Cube Map</h2>
+	<p>
+		In this demo we will use a normalisation cube map.
+		This means that simply, instead of storing colors in our cube map we will store vectors, just as for the normal map.
+		In the texel indexed by (ka, kb, kc), we will store the vector
+	</p>
+	<p>
+		<code>normalize(a, b, c)</code>
+	</p>
+	<p>
+		Thus any vector passed into our cube map will cause the return of the normalised version of that vector.
+		We will use this to ensure the light vector is normalized at every pixel.
+	</p>
+	<p>
+		As a reminder, here is our target:
+	</p>
+	<p>
+		<code>color = max{l.n, 0}*diffuse</code>
+	</p>
+	<p>
+		We know our light's position in world space.
+		We will use the inverse model matrix (see diagram above) to convert this to object space.
+		Then, we will calculate the vector from the vertex we are considering to the light.
+		Then, we can use the TBN matrix to convert our light's position into tangent space, and save this into our vertex structure.
+		We will then draw our torus.
+		The light vector will be normalised by the normalisation cube map.
+		Since the normals in our normal map and the light vector are declared in tangent space, the dot product between them will make sense.
+		Then, we simply multiply the result of this by the diffuse material color.
+	</p>
+	<p>
+		In order to achieve this, we will use the Architecture Review Board approved OpenGL extensions:<br/><br/>
+		ARB_multitexture<br/>
+		ARB_texture_cube_map<br/>
+		ARB_texture_env_combine<br/>
+		ARB_texture_env_dot3
+	</p>
+	<p>
+		Understand all that?
+		If not, don't worry.
+		Try reading it again, and try reading the notes in the code below.
+		If all else fails and you still can't get your head around it, contact me.
+	</p>
+	<p>
+		OK, on with the code...
+	</p>
+	<h2>Setting Up Extensions:</h2>
+	<p>
+		One of the greatest strengths of OpenGL is its ability to be extended.
+		Extensions can be written by hardware vendors to take advantage of hardware features.
+		The extensions we are using here are all "ARB" extensions, which means that they are approved by the OpenGL Architecture Review Board, the people who govern the OpenGL specification.
+		These extensions are all "core" features of the latest version of OpenGL, version1.4.
+		However Microsoft have decided not to ship libraries for any version of OpenGL beyond 1.1 for Windows.
+		OpenGL 1.4 versions can be downloaded, but we will instead access the functions we require using extensions to OpenGL 1.1.
+	</p>
+	<p>
+		The tutorial comes with a .cpp file for each extension we are going to use.
+		Here is the file for ARB_multitexture.
+	</p>
+	<p>
+		First, a boolean variable to hold whether or not the extension is supported:
+	</p>
+	<p>
+		<code>bool ARB_multitexture_supported=false;</code>
+	</p>
+	<p>
+		This function tests whether ARB_multitexture is supported, and if so, initialises it.
+		The names of all extensions supported by your particular implementation of OpenGL are stored in the extensions string.
+		We parse this string trying to find "GL_ARB_multitexture".
+	</p>
+	<p>
+		<code>bool SetUpARB_multitexture()<br/>
+		{</code>
+	</p>
+	<p>
+		Get the extensions string, and look through it for "GL_ARB_multitexture".
+		If it is found, set "ARB_multitexture_supported" to true.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;char * extensionString=(char *)glGetString(GL_EXTENSIONS);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;char * extensionName="GL_ARB_multitexture";<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;char * endOfString; //store pointer to end of string<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;unsigned int distanceToSpace; //distance to next space<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;endOfString=extensionString+strlen(extensionString);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//loop through string<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;while(extensionString&lt;endOfString)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//find distance to next space<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;distanceToSpace=strcspn(extensionString, " ");<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//see if we have found extensionName<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if((strlen(extensionName)==distanceToSpace) &amp;&amp;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(strncmp(extensionName, extensionString, distanceToSpace)==0))<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ARB_multitexture_supported=true;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//if not, move on<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;extensionString+=distanceToSpace+1;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		If we did not find "GL_ARB_multitexture", output an error message and return false.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;if(!ARB_multitexture_supported)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("ARB_multitexture unsupported!\n");<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return false;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;printf("ARB_multitexture supported!\n");</code>
+	</p>
+	<p>
+		If we reached here, ARB_multitexture is supported.
+		In order to use the ARB_multitexture functions, we need to create function pointers for each function.
+		We then use wglGetProcAddress to initialise the function pointers:
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;PFNGLACTIVETEXTUREARBPROC glActiveTextureARB =NULL;<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;wglGetProcAddress("glActiveTextureARB");</code>
+	</p>
+	<p>
+		The function pointers are declared globally, and are declared "extern" in header files.
+		By including the correct header file, and calling "SetUpARB_multitexture" at the start of our program, we can now use the functions.
+	</p>
+	<p>
+		The other three extensions are set up in the same way, but they are simpler because no function pointers are needed.
+	</p>
+	<h2>Creating The Normalisation Cube Map</h2>
+	<p>
+		The function "GenerateNormalisationCubeMap" does exactly what it says on the tin.
+	</p>
+	<p>
+		<code>bool GenerateNormalisationCubeMap()<br/>
+		{</code>
+	</p>
+	<p>
+		First we create space to hold the data for a single face.
+		Each face is 32x32, and we need to store the R, G and B components of the color at each point.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;unsigned char * data=new unsigned char[32*32*3];<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(!data)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("Unable to allocate memory for texture data for cube map\n");<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return false;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		Declare some useful variables.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//some useful variables<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;int size=32;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;float offset=0.5f;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;float halfSize=16.0f;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;VECTOR3D tempVector;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;unsigned char * bytePtr;</code>
+	</p>
+	<p>
+		We will do this next part once for each face.
+		I will show how it is done for the positive x face.
+		The other faces are very similar.
+		Look in the source for details.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//positive x<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;bytePtr=data;</code>
+	</p>
+	<p>
+		Loop through the pixels in the face.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;for(int j=0; j&lt;size; j++)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(int i=0; i&lt;size; i++)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</code>
+	</p>
+	<p>
+		Calculate the vector from the centre of the cube to this texel.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tempVector.SetX(halfSize);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tempVector.SetY(-(j+offset-halfSize));<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tempVector.SetZ(-(i+offset-halfSize));</code>
+	</p>
+	<p>
+		We normalize this vector, pack it to [0, 1] so it can be stored in a color, and save this into the texture data.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tempVector.Normalize();<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tempVector.PackTo01();<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bytePtr[0]=(unsigned char)(tempVector.GetX()*255);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bytePtr[1]=(unsigned char)(tempVector.GetY()*255);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bytePtr[2]=(unsigned char)(tempVector.GetZ()*255);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bytePtr+=3;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		Now we upload this face of the cube to OpenGL.
+		We tell it that this is the positive x face of the current cube map, and where to find the data.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB, 0, GL_RGBA8,<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;32, 32, 0, GL_RGB, GL_UNSIGNED_BYTE, data);</code>
+	</p>
+	<p>
+		After repeating this for each face of the cube, we are done. Don't forget to delete the temporary data storage.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;delete [] data;<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;return true;<br/>
+		}</code>
+	</p>
+	<h2>Creating the torus:</h2>
+	<p>
+		We will store our torus information in a class.
+		First we have a simple class to store the data for one vertex.
+		We store the position and the texture coordinates, followed by the tangents and normal.
+		Finally, we store the tangent space light vector for each vertex.
+		This is the vector from the vertex to the light, in tangent space.
+	</p>
+	<p>
+		<code>class TORUS_VERTEX<br/>
+		{<br/>
+		public:<br/>
+    	&nbsp;&nbsp;&nbsp;&nbsp;VECTOR3D position;<br/>
+    	&nbsp;&nbsp;&nbsp;&nbsp;float s, t;<br/>
+    	&nbsp;&nbsp;&nbsp;&nbsp;VECTOR3D sTangent, tTangent;<br/>
+    	&nbsp;&nbsp;&nbsp;&nbsp;VECTOR3D normal;<br/>
+    	&nbsp;&nbsp;&nbsp;&nbsp;VECTOR3D tangentSpaceLight;<br/>
+        };</code>
+	</p>
+	<p>
+		Now we have the main torus class.
+		This simply stores a list of vertices and a list of indices, and the sizes of these lists.
+		It also contains a function to fill these lists, InitTorus.
+	</p>
+	<p>
+		<code>class TORUS<br/>
+		{<br/>
+		public:<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;TORUS();<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;~TORUS();<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;bool InitTorus();<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;int numVertices;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;int numIndices;<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;unsigned int * indices;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;TORUS_VERTEX * vertices;<br/>
+		};</code>
+	</p>
+	<p>
+		We define our torus to have a precision of 48.
+		This means that there are 48 vertices per ring when we construct it.
+	</p>
+	<p>
+		<code>const int torusPrecision=48;</code>
+	</p>
+	<p>
+		The constructor for the torus calls the Init function.
+	</p>
+	<p>
+		<code>TORUS::TORUS()<br/>
+		{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;InitTorus();<br/>
+		}</code>
+	</p>
+	<p>
+		The torus destructor deletes the index and vertex lists to free up the memory.
+	</p>
+	<p>
+		<code>TORUS::~TORUS()<br/>
+		{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(indices)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;delete [] indices;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;indices=NULL;<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(vertices)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;delete [] vertices;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;vertices=NULL;<br/>
+		}</code>
+	</p>
+	<p>
+		This is our torus initiation function.
+	</p>
+	<p>
+		<code>bool TORUS::InitTorus()<br/>
+		{</code>
+	</p>
+	<p>
+		We calculate the number of vertices and the nuber of indices. Then create space for the vertex and index lists.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;numVertices=(torusPrecision+1)*(torusPrecision+1);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;numIndices=2*torusPrecision*torusPrecision*3;<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;vertices=new TORUS_VERTEX[numVertices];<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(!vertices)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("Unable to allocate memory for torus vertices\n");<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return false;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;indices=new unsigned int[numIndices];<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(!indices)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("Unable to allocate memory for torus indices\n");<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return false;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		Now we calculate the torus vertex positions, normals etc.
+	</p>
+	<p>
+ 		First we generate a ring of 48 vertices in the XY plane, off to the right of the origin:
+	</p>
+	<img src="torus1.jpg" alt="Generating the torus 1"/>
+	<p>
+		The normals for these vertices are as shown.
+		We also set the T texture coordinate to increse linearly with i, and the S texture coordinate to be 0.
+		Thus, the T tangent points in the direction of increasing i.
+		The S tangent points into the screen for a reason we will see in a minute.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//calculate the first ring - inner radius 4, outer radius 1.5<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;for(int i=0; i&lt;torusPrecision+1; i++)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].position=VECTOR3D(1.5f, 0.0f, 0.0f).GetRotatedZ(
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i*360.0f/torusPrecision)+VECTOR3D(4.0f, 0.0f, 0.0f);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].s=0.0f;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].t=(float)i/torusPrecision;<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].sTangent.Set(0.0f, 0.0f, -1.0f);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].tTangent=VECTOR3D(0.0f, -1.0f, 0.0f).GetRotatedZ(i*360.0f/torusPrecision);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].normal=vertices[i].tTangent.CrossProduct(vertices[i].sTangent);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		Next, we rotate this entire ring around the Y axis in steps of 2*PI/48 rads.
+		This will generate the other rings to form the torus out of.
+		All normals, tangents etc get rotated, and the T texture coordinates remain the same as in the original ring.
+		The S texture coordinates increase from one ring to the next.
+		This is why the S tangent of the first ring points into the screen.
+		This picture is an aerial view of the picture above.
+	</p>
+	<img src="torus2.jpg" alt="Generating the torus 2"/>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//rotate the first ring to get the other rings<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;for(int ring=1; ring&lt;torusPrecision+1; ring++)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(i=0; i&lt;torusPrecision+1; i++)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[ring*(torusPrecision+1)+i].position=<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].position.GetRotatedY(ring*360.0f/torusPrecision);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[ring*(torusPrecision+1)+i].s=2.0f*ring/torusPrecision;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[ring*(torusPrecision+1)+i].t=vertices[i].t;<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[ring*(torusPrecision+1)+i].sTangent=<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].sTangent.GetRotatedY(ring*360.0f/torusPrecision);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[ring*(torusPrecision+1)+i].tTangent=<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].tTangent.GetRotatedY(ring*360.0f/torusPrecision);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[ring*(torusPrecision+1)+i].normal=<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertices[i].normal.GetRotatedY(ring*360.0f/torusPrecision);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		Now we calculate the indices to construct triangles out of the vertices that we just placed.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//calculate the indices<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;for(ring=0; ring&lt;torusPrecision; ring++)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(i=0; i&lt;torusPrecision; i++)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;indices[((ring*torusPrecision+i)*2)*3+0]=ring*(torusPrecision+1)+i;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;indices[((ring*torusPrecision+i)*2)*3+1]=(ring+1)*(torusPrecision+1)+i;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;indices[((ring*torusPrecision+i)*2)*3+2]=ring*(torusPrecision+1)+i+1;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;indices[((ring*torusPrecision+i)*2+1)*3+0]=ring*(torusPrecision+1)+i+1;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;indices[((ring*torusPrecision+i)*2+1)*3+1]=(ring+1)*(torusPrecision+1)+i;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;indices[((ring*torusPrecision+i)*2+1)*3+2]=(ring+1)*(torusPrecision+1)+i+1;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		OK, that's the torus done!
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;return true;<br/>
+		}</code>
+	</p>
+	<h2>Finally, on to the main file:</h2>
+	<p>
+		First we include the necessary header files.
+	</p>
+	<p>
+		"WIN32_LEAN_AND_MEAN" simply tells windows.h not to include lots of obscure stuff which we will not be using.<br/>
+		We then include "glut.h", which will itself include "gl.h" and "glu.h".<br/>
+		"glext.h" contains the tokens required for the extensions we will be using.<br/>
+		Then, we include the headers we made for the extensions.
+		"IMAGE.h" is an image class for loading in our normal map and texture map.
+		"Maths.h" contains the vector and matrix classes we will be using.
+		"TORUS.h" contains the details of the torus we will draw, and "Normalisation cube map.h" contains...well, I'll leave that to you to figure out.
+	</p>
+	<p>
+		<code>#define WIN32_LEAN_AND_MEAN<br/>
+		#include &lt;windows.h&gt;<br/>
+		#include &lt;stdio.h&gt;<br/>
+		#include &lt;GL/glut.h&gt;<br/>
+		#include &lt;GL/glext.h&gt;<br/>
+		#include "Extensions/ARB_multitexture_extension.h"<br/>
+		#include "Extensions/ARB_texture_cube_map_extension.h"<br/>
+		#include "Extensions/ARB_texture_env_combine_extension.h"<br/>
+		#include "Extensions/ARB_texture_env_dot3_extension.h"<br/>
+		#include "Image/IMAGE.h"<br/>
+		#include "Maths/Maths.h"<br/>
+		#include "TORUS.h"<br/>
+		#include "Normalisation Cube Map.h"</code>
+	</p>
+	<p>
+		We will now declare some global objects, including booleans for whether or not to draw the bump map and color texture.
+	</p>
+	<p>
+		<code>//Our torus<br/>
+		TORUS torus;<br/>
+		<br/>
+		//Normal map<br/>
+		GLuint normalMap;<br/>
+		<br/>
+		//Decal texture<br/>
+		GLuint decalTexture;<br/>
+		<br/>
+		//Normalisation cube map<br/>
+		GLuint normalisationCubeMap;<br/>
+		<br/>
+		//Light position in world space<br/>
+		VECTOR3D worldLightPosition=VECTOR3D(10.0f, 10.0f, 10.0f);<br/>
+		<br/>
+		bool drawBumps=true;<br/>
+		bool drawColor=true;</code>
+	</p>
+	<p>
+		Now, we create a function called "Init".
+		This is called once at the beginning of our program, but AFTER our window has been created.
+	</p>
+	<p>
+		<code>
+		//Called for initiation<br/>
+		void Init(void)<br/>
+		{</code>
+	</p>
+	<p>
+		First, we set up the extensions we will be using.
+		If an extension setup returns false, the extension is not supported.
+		So, we cannot run the demo.
+		Output an error message and quit.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//Check for and set up extensions<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if( !SetUpARB_multitexture() || !SetUpARB_texture_cube_map() ||<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!SetUpARB_texture_env_combine() || !SetUpARB_texture_env_dot3())<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("Required Extension Unsupported\n");<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exit(0);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		Now we set OpenGL states.
+		This bit of code is probably familiar to anyone who has seen <a href="http://nehe.gamedev.net">NeHe's tutorials</a>.
+		We load the identity modelview matrix, set up our color and depth states, then enable backface culling.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//Load identity modelview<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glMatrixMode(GL_MODELVIEW);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glLoadIdentity();<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//Shading states<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glShadeModel(GL_SMOOTH);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glClearColor(0.2f, 0.4f, 0.2f, 0.0f);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glColor4f(1.0f, 1.0f, 1.0f, 1.0f);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//Depth states<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glClearDepth(1.0f);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glDepthFunc(GL_LEQUAL);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glEnable(GL_DEPTH_TEST);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glEnable(GL_CULL_FACE);</code>
+	</p>
+	<p>
+		Now, we load in our textures.
+		First we use the IMAGE class to load in the decal(color) map.
+		Then, since our texture map is paletted (8 bits per pixel), we expand it to be 24bpp before sending to OpenGL.
+		We use glTexImage2D to send the data, then set the texture's parameters.
+		We do exactly the same for the normal map.
+	</p>
+	<p>
+		<code>
+		&nbsp;&nbsp;&nbsp;&nbsp;//Load decal texture<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;IMAGE decalImage;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;decalImage.Load("decal.bmp");<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;decalImage.ExpandPalette();<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//Convert normal map to texture<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glGenTextures(1, &amp;decalTexture);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glBindTexture(GL_TEXTURE_2D, decalTexture);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, decalImage.width, decalImage.height,<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0, decalImage.format, GL_UNSIGNED_BYTE, decalImage.data);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//Load normal map<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;IMAGE normalMapImage;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;normalMapImage.Load("Normal map.bmp");<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;normalMapImage.ExpandPalette();<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//Convert normal map to texture<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glGenTextures(1, &amp;normalMap);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glBindTexture(GL_TEXTURE_2D, normalMap);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, normalMapImage.width, normalMapImage.height,<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0, normalMapImage.format, GL_UNSIGNED_BYTE, normalMapImage.data);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);</code>
+	</p>
+	<p>
+		Now, we create our normalisation cube map.
+		We create a texture just as before, but instead of using "GL_TEXTURE_2D", we use "GL_TEXTURE_CUBE_MAP_ARB".
+		The "ARB" on the end signifies this token is part of an ARB extension.
+		Instead of using the LoadTexture routine however, we generate the data for the cube map and send it to OpenGL in the "GenerateNormalisationCubeMap" function discussed above.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//Create normalisation cube map<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glGenTextures(1, &amp;normalisationCubeMap);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, normalisationCubeMap);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;GenerateNormalisationCubeMap();<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);<br/>
+		}</code>
+	</p>
+	<p>
+		OK, that's it for initiation. Now it's time to draw something!
+	</p>
+	<p>
+		<code>//Called to draw scene<br/>
+		void Display(void)<br/>
+		{</code>
+	</p>
+	<p>
+		First, clear the color and depth buffers, and reset the modelview matrix to identity.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glLoadIdentity();</code>
+	</p>
+	<p>
+		Now set up the modelview matrix.<br/>
+		First we apply the viewing transformation, the "view matrix" in the diagram above.
+		This basically places our camera in the scene.
+		We use gluLookAt to place the camera at (0.0, 10.0, 10.0), looking at the origin.<br/>
+		Next, we set up the model matrix.
+		Remember the modelview matrix is simply the model matrix followed by the view matrix.
+		However, OpenGL requires that we specify the transformations in the reverse order to that in which they occur.
+		We want to rotate the torus around the Y axis.
+		We have a static variable to keep our rotation, and we simply increase this value, and then send the rotation to OpenGL.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//use gluLookAt to look at torus<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;gluLookAt(0.0f,10.0f,10.0f,<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0f, 0.0f, 0.0f,<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.0f, 1.0f, 0.0f);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//rotate torus<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;static float angle=0.0f;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;angle+=0.1f;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glRotatef(angle, 0.0f, 1.0f, 0.0f);</code>
+	</p>
+	<p>
+		We now calculate the inverse model matrix.
+		As you will know, this converts from world space to object space.<br/>
+		First we save the current modelview matrix.
+		Then we reset it to identity.
+		The inverse of a rotation by an angle a is the rotation around the same axis by -a.
+		We send this rotation to OpenGL, and use GetFloatv to get the matrix.
+		Then we restore the modelview matrix which we saved.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//Get the inverse model matrix<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;MATRIX4X4 inverseModelMatrix;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glPushMatrix();<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glLoadIdentity();<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glRotatef(-angle, 0.0f, 1.0f, 0.0f);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glGetFloatv(GL_MODELVIEW_MATRIX, inverseModelMatrix);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glPopMatrix();</code>
+	</p>
+	<p>
+		Now, we use the matrix we just calculated to convert the light's position into object space.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//Get the object space light vector<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;VECTOR3D objectLightPosition=inverseModelMatrix*worldLightPosition;</code>
+	</p>
+	<p>
+		Now, we need to calculate the tangent space light vector for each vertex.
+		We loop through all of the vertices, and fill in the vector.<br/>
+		Looking at the above diagram (again), we see that the TSB matrix takes points in object space and converts them to tangent space.<br/>
+		We know our light position in object space.
+		We subtract from this the vertex position to get the vector from the vertex to the light.
+		We can use the TSB matrix to convert this to tangent space. The TSB matrix has the form:
+	</p>
+	<p>
+		<code>( Sx Sy Sz )<br/>
+		( Tx Ty Tz )<br/>
+		( Nx Ny Nz )</code>
+	</p>
+	<p>
+		So, the first component of the tangent space light vector is given by <code>(Sx, Sy, Sz)</code>.
+		<code>(Lx, Ly, Lz)</code> where L is the vector from the vertex to the light.
+		Similarly, the other two components are given by simple dot products.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//Loop through vertices<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;for(int i=0; i&lt;torus.numVertices; ++i)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VECTOR3D lightVector=objectLightPosition-torus.vertices[i].position;<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Calculate tangent space light vector<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;torus.vertices[i].tangentSpaceLight.x=<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;torus.vertices[i].sTangent.DotProduct(lightVector);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;torus.vertices[i].tangentSpaceLight.y=<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;torus.vertices[i].tTangent.DotProduct(lightVector);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;torus.vertices[i].tangentSpaceLight.z=<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;torus.vertices[i].normal.DotProduct(lightVector);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		Now we can draw the torus.
+		We draw the bump mapped torus in two passes.
+		First we draw the bumps, then we multiply by the color texture.
+		We can turn these passes on and off for different effects.
+		First, draw the bump pass if necessary.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//Draw bump pass<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(drawBumps)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{</code>
+	</p>
+	<p>
+		First, we bind the textures we will use.
+		We bind the normal map to unit 0, and enable 2D texturing.
+		We then bind the normalisation cube map to texture unit 1, and enable cube-map texturing.
+		Then we reset the current texture unit to unit 0.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Bind normal map to texture unit 0<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glBindTexture(GL_TEXTURE_2D, normalMap);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnable(GL_TEXTURE_2D);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Bind normalisation cube map to texture unit 1<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glActiveTextureARB(GL_TEXTURE1_ARB);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, normalisationCubeMap);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnable(GL_TEXTURE_CUBE_MAP_ARB);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glActiveTextureARB(GL_TEXTURE0_ARB);</code>
+	</p>
+	<p>
+		Now we set up the vertex arrays we will use.<br/>
+		We set up the vertex pointer to point to the positions, and enable the vertex array.<br/>
+		The texture coordinate arrays are set up for each texture unit.<br/>
+		The texture coordinate set for unit 0 is simply the s and t texture coordinates.
+		Thus, the normal map will be applied to the torus just like a standard texture map.<br/>
+		The texture coordinate set for unit 1 is simply the tangent space light vector.
+		As we have set texture 1 to be the normalisation cube map, texture 1 will contain the normalised tangent space light vector for each pixel.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Set vertex arrays for torus<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glVertexPointer(3, GL_FLOAT, sizeof(TORUS_VERTEX), &amp;torus.vertices[0].position);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnableClientState(GL_VERTEX_ARRAY);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Send texture coords for normal map to unit 0<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexCoordPointer(2, GL_FLOAT, sizeof(TORUS_VERTEX), &amp;torus.vertices[0].s);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnableClientState(GL_TEXTURE_COORD_ARRAY);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Send tangent space light vectors for normalisation to unit 1<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glClientActiveTextureARB(GL_TEXTURE1_ARB);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexCoordPointer(3, GL_FLOAT, sizeof(TORUS_VERTEX), &amp;torus.vertices[0].tangentSpaceLight);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnableClientState(GL_TEXTURE_COORD_ARRAY);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glClientActiveTextureARB(GL_TEXTURE0_ARB);</code>
+	</p>
+	<p>
+		We have the normal in texture 0, and the normalised tangent space light vector in unit 1.
+		Remember our aim is to evaluate:
+	</p>
+	<p>
+		<code>color = max{l.n, 0}*diffuse</code>
+	</p>
+	<p>
+		We will multiply by diffuse in the second pass, so we need to evaluate tex0 dot tex1.
+		So, we will use the ARB_texture_env_combine and ARB_texture_env_dot3 extensions to achieve this.
+		The first texture unit will replace the fragment color with the texture color, i.e. the normal map.<br/>
+		The second texture unit will dot this with texture 1, i.e. the light vector.
+		Since both are in tangent space, the dot product makes sense.
+		Also, as this is output as a color, it will be clamped to [0,1].
+		So, we are set up to evaluate the first term of our equation.
+		You can see what this term looks like on its own by pressing '2' in the demo.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Set up texture environment to do (tex0 dot tex1)*color<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_REPLACE);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glActiveTextureARB(GL_TEXTURE1_ARB);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_DOT3_RGB_ARB);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PREVIOUS_ARB);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glActiveTextureARB(GL_TEXTURE0_ARB);</code>
+	</p>
+	<p>
+		If you have been paying attention, you may be wondering about the fact that the vectors were packed into [0, 1] in the textures, and we did nothing about expanding them back to [-1, 1].
+		Don't worry, the "DOT3_RGB_ARB" texture environment will do this for us automatically.
+	</p>
+	<p>
+		Now, we can draw the torus.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Draw torus<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDrawElements(GL_TRIANGLES, torus.numIndices, GL_UNSIGNED_INT, torus.indices);</code>
+	</p>
+	<p>
+		We have drawn what we need to with this setup, so we can disable the textures and the vertex arrays.
+		We also reset the texture environment to the standard "modulate".
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Disable textures<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisable(GL_TEXTURE_2D);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glActiveTextureARB(GL_TEXTURE1_ARB);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisable(GL_TEXTURE_CUBE_MAP_ARB);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glActiveTextureARB(GL_TEXTURE0_ARB);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//disable vertex arrays<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisableClientState(GL_VERTEX_ARRAY);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisableClientState(GL_TEXTURE_COORD_ARRAY);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glClientActiveTextureARB(GL_TEXTURE1_ARB);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisableClientState(GL_TEXTURE_COORD_ARRAY);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glClientActiveTextureARB(GL_TEXTURE0_ARB);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Return to standard modulate texenv<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		The next step is to draw the diffuse color, our textured torus.
+		If we are drawing both the bump map pass and the textured pass, we combine them by multiplication.
+		So, we enable multiplicative blending.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//If we are drawing both passes, enable blending to multiply them together<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(drawBumps &amp;&amp; drawColor)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Enable multiplicative blending<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glBlendFunc(GL_DST_COLOR, GL_ZERO);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnable(GL_BLEND);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		Now we can draw the textured pass.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//Perform a second pass to color the torus<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(drawColor)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{</code>
+	</p>
+	<p>
+		If we are not drawing the bump mapped pass, we will enable a standard OpenGL light to enable us to compare the non-bumpmapped torus to the bumpmapped one.
+		You can see the standard lit torus by pressing '3' in the demo.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(!drawBumps)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glLightfv(GL_LIGHT1, GL_POSITION, VECTOR4D(objectLightPosition));<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glLightfv(GL_LIGHT1, GL_DIFFUSE, white);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glLightfv(GL_LIGHT1, GL_AMBIENT, black);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnable(GL_LIGHT1);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnable(GL_LIGHTING);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glMaterialfv(GL_FRONT, GL_DIFFUSE, white);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		We bind our decal (color) texture to texture unit 0, and enable 2d texturing.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Bind decal texture<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glBindTexture(GL_TEXTURE_2D, decalTexture);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnable(GL_TEXTURE_2D);</code>
+	</p>
+	<p>
+		Now we enable the vertex array and texture coordinate array as above.
+		This time, we also enable a normal array, for the standard OpenGL lighting.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Set vertex arrays for torus<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glVertexPointer(3, GL_FLOAT, sizeof(TORUS_VERTEX), &amp;torus.vertices[0].position);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnableClientState(GL_VERTEX_ARRAY);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glNormalPointer(GL_FLOAT, sizeof(TORUS_VERTEX), &amp;torus.vertices[0].normal);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnableClientState(GL_NORMAL_ARRAY);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glTexCoordPointer(2, GL_FLOAT, sizeof(TORUS_VERTEX), &amp;torus.vertices[0].s);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glEnableClientState(GL_TEXTURE_COORD_ARRAY);</code>
+	</p>
+	<p>
+		Now we draw the torus and reset the OpenGL states (lighting, texturing etc).
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Draw torus<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDrawElements(GL_TRIANGLES, torus.numIndices, GL_UNSIGNED_INT, torus.indices);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(!drawBumps)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisable(GL_LIGHTING);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//Disable texture<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisable(GL_TEXTURE_2D);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//disable vertex arrays<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisableClientState(GL_VERTEX_ARRAY);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisableClientState(GL_NORMAL_ARRAY);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glDisableClientState(GL_TEXTURE_COORD_ARRAY);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//Disable blending if it is enabled<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(drawBumps &amp;&amp; drawColor)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glDisable(GL_BLEND);</code>
+	</p>
+	<p>
+		glFinish tells OpenGL to complete any drawing.<br/>
+		glutSwapBuffers swaps the front and back color buffers.<br/>
+		glutPostRedisplay tells glut we want it to draw the next frame as soon as possible.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;glFinish();<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutSwapBuffers();<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutPostRedisplay();<br/>
+		}</code>
+	</p>
+	<p>
+		That's all the drawing!
+	</p>
+	<p>
+		Now we need to create a few more functions for glut.
+		These should be familiar to you if you have used glut before.
+	</p>
+	<p>
+		Reshape() is called when the window resizes.
+		It resets the viewport to be the whole screen and also resets the projection matrix to the correct aspect ratio.
+	</p>
+	<p>
+		<code>//Called on window resize<br/>
+		void Reshape(int w, int h)<br/>
+		{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//Set viewport<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(h==0)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h=1;<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glViewport(0, 0, w, h);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//Set up projection matrix<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glMatrixMode(GL_PROJECTION);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glLoadIdentity();<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;gluPerspective( 45.0f, (GLfloat)w/(GLfloat)h, 1.0f, 100.0f);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glMatrixMode(GL_MODELVIEW);<br/>
+		}</code>
+	</p>
+	<p>
+		Keyboard() is called when a key is pressed.
+	</p>
+	<p>
+		<code>//Called when a key is pressed<br/>
+		void Keyboard(unsigned char key, int x, int y)<br/>
+		{</code>
+	</p>
+	<p>
+		If the user has pressed escape, we exit.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//If escape is pressed, exit<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(key==27)<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;exit(0);</code>
+	</p>
+	<p>
+		If '1' is pressed, we want to draw both the bump map pass and the color pass. So, set the two booleans to true.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//'1' draws both passes<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(key=='1')<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drawBumps=true;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drawColor=true;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		If '2' is pressed, we only want to draw the bump pass, so set that to true, and the other pass to false.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//'2' draws only bumps<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(key=='2')<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drawBumps=true;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drawColor=false;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		If you press 3, we only want to draw the color pass. So, disable the bump pass.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//'3' draws only color<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(key=='3')<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drawBumps=false;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drawColor=true;<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+	</p>
+	<p>
+		If 'W' is pressed, we set the current drawing mode to wireframe.<br/>
+		If 'F' is pressed, we set the mode to filled polygons.
+	</p>
+	<p>
+		<code>&nbsp;&nbsp;&nbsp;&nbsp;//'W' draws in wireframe<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(key=='W' || key=='w')<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glPolygonMode(GL_FRONT, GL_LINE);<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;//'F' return to fill<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;if(key=='F' || key=='f')<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;glPolygonMode(GL_FRONT, GL_FILL);<br/>
+		}</code>
+	</p>
+	<p>
+		Finally, our main function.
+		This is a pretty standard glut affair.
+		We Initiate glut, and create a window with a double buffer, RGB mode(as opposed to color index mode) anda depth buffer.
+		Then, we call our Init function from above.
+		We then tell glut where to find the display, reshape and keyboard functions.
+		This is called "registering callbacks".
+		Then, we tell glut to begin drawing. Glut will handle our program from here.
+	</p>
+	<p>
+		<code>int main(int argc, char** argv)<br/>
+		{<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutInit(&amp;argc, argv);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutInitWindowSize(640, 480);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutCreateWindow("Simple Bumpmapping");<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;Init();<br/>
+		<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutDisplayFunc(Display);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutReshapeFunc(Reshape);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutKeyboardFunc(Keyboard);<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;glutMainLoop();<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;return 0;<br/>
+		}</code>
+	</p>
+	<p>
+		That's it! I hope you understood most of that and look forward to seeing what you can do with it!
+	</p>
+	<h2>Addendum:</h2>
+	<p>
+		I have received several requests for code to calculate the tangent space basis for a general polygon.<br/>
+		I recommend you use the code found at
+		<a href="http://www.terathon.com/code/tangent.php">
+			http://www.terathon.com/code/tangent.php
+		</a>
+	</p>
+	<h2>Download:</h2>
+    <p>
+		You can download the exe and source here:<br/>
+		<a href="simplebump.zip">
+			simplebump.zip (132 KB)
+		</a>
+	</p>
+	<h2>References:</h2>
+    <p>
+		Per-Pixel Lighting, by Philip Taylor.
+    	<a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dndrive/html/directx11192001.asp">
+			http://msdn.microsoft.com
+		</a>
+	</p>
+	<p>
+		OpenGL Extension Registry.
+		<a href="http://oss.sgi.com/projects/ogl-sample/registry/">
+			http://oss.sgi.com/projects/ogl-sample/registry/
+		</a>
+	</p>
+</div>
+
+</body>
+
+</html>

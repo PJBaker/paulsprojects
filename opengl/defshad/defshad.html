@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<link rel="stylesheet" href="../../main.css" type="text/css"/>
+	<!--[if lt IE 7]><link rel="stylesheet" href="../../ie6.css" type="text/css"/><![endif]-->
+	<!--[if IE 7]><link rel="stylesheet" href="../../ie7.css" type="text/css"/><![endif]-->
+	<title>OpenGL Deferred Shading - Paul's Projects</title>
+</head>
+
+<body class="grey_background">
+
+<div id="menu">
+	<a href="../../index.html">
+		<img src="../../logo.png" alt="Paul's Projects" style="border: none"/>
+	</a>
+	<div class="menu_small_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li"><a class="menu_a" href="../../index.html">Home</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../metaballs2/metaballs2.html">Metaballs II</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../sonicplayer/sonicplayer.html">SonicPlayer</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../vmachine/vmachine.html">VMachine</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../tutorials/tutorials.html">OpenGL Tutorials</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../opengl/projects1.html">OpenGL Projects</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../sh/sh.html">Spherical Harmonics</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../painting/painting.html">Painterly Rendering</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../marble/marble.html">Marble</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../defshad/defshad.html">Deferred Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../octagon/octagon.html">The Octagon Engine</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../manylights/manylights.html">Many Lights</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../cloth/cloth.html">Cloth Simulation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../gpufire/gpufire.html">GPU Fire</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../rtotex/rtotex.html">Render to Texture</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadvol/shadvol.html">Shadow Volumes</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../refract/refract.html">Refraction</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../ppatten/ppatten.html">Per Pixel Attenuation</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../q3bsp/q3bsp.html">Quake 3 BSP</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../dpreflect/dpreflect.html">Dot Product Reflect</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../shadowmap/shadowmap.html">Shadow Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../metaballs/metaballs.html">Metaballs</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpatten/bumpatten.html">Per Pixel Lighting</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../celshading/celshading.html">Cel Shading</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../bumpmap/bumpmap.html">Bump Mapping</a></li>
+		<li class="menu2_li"><a class="menu2_a" href="../template/template.html">Project Template</a></li>
+		<li class="menu_li"><a class="menu_a" href="../../direct3d/projects1.html">Direct3D Projects</a></li>
+		<li class="menu_li_bottom"><a class="menu_a" href="../../megareader/megareader.html">MegaReader</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<ul class="menu_ul">
+		<li class="menu_li_bottom"><a class="menu_a" href="mailto:paul@paulsprojects.net">Contact Me</a></li>
+	</ul>
+	<div class="menu_spacing">
+	</div>
+	<div style="text-align: center">
+    	<a href="http://validator.w3.org/check?uri=referer">
+			<img src="../../thumbnails/valid-xhtml10.png"
+        		alt="Valid XHTML 1.0 Strict"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+  		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.paulsprojects.net/main.css">
+			<img src="../../thumbnails/valid-css.png"
+				alt="Valid CSS"
+				width="88"
+				height="31" 
+				style="border: none"/></a>
+	</div>
+</div>
+
+<div id="main">
+	<h1>Deferred Shading</h1>
+	<div style="text-align: center">
+		<img src="defshad1.png" alt="Deferred Shading 1" style="border: 3px solid #4040FF"/>
+       	&nbsp;
+       	<img src="defshad2.png" alt="Deferred Shading 2" style="border: 3px solid #4040FF"/>
+	</div>
+	<h2>Description:</h2>
+	<p>
+		This project displays a torus knot lit by 8 point lights.
+		The lights are diffuse only, and their contributions to the scene(including attenuation) are calculated per pixel using fragment programs.
+		This is done in two ways.
+	</p>
+	<p>
+		In the "standard" shading method, a first pass is made to set the depth buffer to hold the depth of the nearest fragment.
+		Then the mesh is drawn once per light, and each time, the lighting contribution is added to the framebuffer.
+		The scissor test is used to restrict drawing to a small window rectangle containing the projection of the sphere of influence of the light.
+	</p>
+	<p>
+		This project's main feature however, is the "deferred" shading method.
+		Here, the mesh is drawn once and the positions and normals at each fragment are saved into a floating point buffer.
+		Then, for each light, this buffer is used as a texture and a flat quad is drawn covering the sphere of influence of each light.
+		A fragment program unpacks the values from the buffer and, using the light's position, color etc as parameters, evaluates the lighting equation and adds it to the framebuffer.
+	</p>
+	<p>
+		The advantage of the deferred shading approach is that the mesh (32000 vertices) need only be drawn once.
+	</p>
+	<h2>Requirements:</h2>
+    <p>
+		ARB_fragment_program<br/>
+		ARB_vertex_buffer_object<br/>
+		ARB_vertex_program<br/>
+		NV_float_buffer<br/>
+		NV_fragment_program<br/>
+		NV_texture_rectangle<br/>
+		WGL_ARB_extensions_string<br/>
+		WGL_ARB_pbuffer<br/>
+		WGL_ARB_pixel_format
+	</p>
+	<h2>References:</h2>
+    <p>
+		Deferred Shading, by Tom Nuydens.
+		<a href="http://www.delphi3d.net/articles/viewarticle.php?article=deferred.htm">
+			http://www.delphi3d.net/articles/viewarticle.php?article=deferred.htm
+		</a>
+	</p>
+	<h2>Download:</h2>
+    <p>
+		<a href="defshad.zip">
+			defshad.zip (387 KB)
+		</a>
+	</p>
+</div>
+
+</body>
+
+</html>
